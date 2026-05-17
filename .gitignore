@@ -1,0 +1,15 @@
+# IDE and editor-specific settings
+/.fleet
+/.idea
+/.vscode
+
+# macOS system files
+.DS_Store
+
+# Placeholder files
+!.gitkeep
+
+# Environment configuration
+.env
+
+compose.yaml

@@ -1,0 +1,48 @@
+services:
+   heyform:
+      image: heyform/community-edition:latest
+      depends_on:
+         - mongo
+         - redis
+      environment:
+         TZ: "Europe/Berlin"
+         APP_HOMEPAGE_URL: "https://${DOMAIN}"
+         SESSION_KEY: ${SESSION_KEY}
+         FORM_ENCRYPTION_KEY: ${FORM_ENCRYPTION_KEY}
+         MONGO_URI: "mongodb://mongo:27017/heyform"
+         REDIS_HOST: redis
+         REDIS_PORT: 6379
+      labels:
+         caddy_0: ${DOMAIN}
+         caddy_0.reverse_proxy: "{{upstreams 8000}}"
+         caddy_0.encode: zstd gzip
+      restart: unless-stopped
+      networks:
+         - default
+         - main-proxy
+
+   mongo:
+      image: mongo:4.4
+      environment:
+         TZ: "Europe/Berlin"
+      volumes:
+         - db_volume:/data/db
+      restart: unless-stopped
+
+   redis:
+      image: redis:7-alpine
+      command: redis-server --appendonly yes --maxmemory 200mb --maxmemory-policy allkeys-lru
+      environment:
+         TZ: "Europe/Berlin"
+      volumes:
+         - redis_volume:/data
+      mem_limit: 256m
+      restart: unless-stopped
+
+volumes:
+   db_volume:
+   redis_volume:
+
+networks:
+   main-proxy:
+      external: true
