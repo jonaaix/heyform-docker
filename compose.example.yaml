@@ -18,8 +18,12 @@ services:
             SMTP_USER: ${SMTP_USER}
             SMTP_PASSWORD: ${SMTP_PASSWORD}
             SMTP_FROM: ${SMTP_FROM}
+            OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+            OPENAI_API_KEY: ${OPENAI_API_KEY}
+            OPENAI_GPT_MODEL: ${OPENAI_GPT_MODEL}
         volumes:
             - uploads_volume:/app/static/upload
+            - ./patches/ai.resolver.js:/app/packages/server/dist/src/resolver/form/ai.resolver.js:ro
         labels:
             caddy_0: ${DOMAIN}
             caddy_0.reverse_proxy: "{{upstreams 9157}}"
@@ -30,7 +34,7 @@ services:
             - main-proxy
 
     mongo:
-        image: percona/percona-server-mongodb:4.4
+        image: mongo:4.4
         environment:
             TZ: "Europe/Berlin"
         volumes:
@@ -38,7 +42,7 @@ services:
         restart: unless-stopped
 
     keydb:
-        image: eqalpha/keydb:6.3.3
+        image: eqalpha/keydb:latest
         command: keydb-server --appendonly yes --maxmemory 200mb --maxmemory-policy allkeys-lru
         environment:
             TZ: "Europe/Berlin"
